@@ -1,5 +1,37 @@
 package words
 
+import (
+	"maps"
+	"slices"
+	"strings"
+	"unicode"
+
+	"github.com/kljensen/snowball/english"
+)
+
 func Norm(phrase string) []string {
-	return nil
+	words := make(map[string]bool)
+	splitted := strings.FieldsFunc(phrase, func(r rune) bool {
+		return !unicode.IsDigit(r) && !unicode.IsLetter(r)
+	})
+	for _, w := range splitted {
+		w := strings.ToLower(w)
+		if !isEnglishWord(w) {
+			continue
+		}
+		if english.IsStopWord(w) {
+			continue
+		}
+		words[english.Stem(w, false)] = true
+	}
+	return slices.Collect(maps.Keys(words))
+}
+
+func isEnglishWord(word string) bool {
+	for _, r := range word {
+		if !unicode.Is(unicode.Latin, r) {
+			return false
+		}
+	}
+	return len(word) > 0
 }

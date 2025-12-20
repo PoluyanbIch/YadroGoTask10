@@ -18,6 +18,6 @@ type Updater interface {
 }
 
 type Searcher interface {
-	Search(context.Context, string, int) ([]Comics, error)
-	SearchIndex(context.Context, string, int) ([]Comics, error)
+	Search(context.Context, string, int) (SearchReply, error)
+	ISearch(context.Context, string, int) (SearchReply, error)
 }

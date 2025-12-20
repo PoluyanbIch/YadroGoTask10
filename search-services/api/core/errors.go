@@ -2,6 +2,13 @@ package core
 
 import "errors"
 
-var ErrBadArguments = errors.New("arguments are not acceptable")
-var ErrAlreadyExists = errors.New("resource or task already exists")
-var ErrNotFound = errors.New("resource is not found")
+var (
+	ErrBadArguments       = errors.New("arguments are not acceptable")
+	ErrServiceUnavailable = errors.New("service unavailable")
+	ErrInternal           = errors.New("internal error")
+	ErrUpdateInProgress   = errors.New("update in progress")
+
+	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrInvalidToken       = errors.New("invalid token")
+	ErrUnauthorised       = errors.New("unauthorise")
+)

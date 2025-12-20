@@ -8,8 +8,8 @@ protobuf:
                --go-grpc_out=. --go-grpc_opt=paths=source_relative \
                proto/update/update.proto
 	protoc --go_out=. --go_opt=paths=source_relative \
-               --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-               proto/search/search.proto
+			   --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+			   proto/search/search.proto
 
 protolint:
 	protolint .

@@ -1,11 +1,11 @@
 package aaa
 
 import (
-	"errors"
-	"fmt"
 	"log/slog"
-	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"yadro.com/course/api/core"
 )
 
 const secretKey = "something secret here" // token sign key
@@ -18,29 +18,47 @@ type AAA struct {
 	log      *slog.Logger
 }
 
-func New(tokenTTL time.Duration, log *slog.Logger) (AAA, error) {
-	const adminUser = "ADMIN_USER"
-	const adminPass = "ADMIN_PASSWORD"
-	user, ok := os.LookupEnv(adminUser)
-	if !ok {
-		return AAA{}, fmt.Errorf("could not get admin user from enviroment")
-	}
-	password, ok := os.LookupEnv(adminPass)
-	if !ok {
-		return AAA{}, fmt.Errorf("could not get admin password from enviroment")
-	}
-
+func New(tokenTTL time.Duration, log *slog.Logger, adminUser string, adminPass string) AAA {
 	return AAA{
-		users:    map[string]string{user: password},
+		users:    map[string]string{adminUser: adminPass},
 		tokenTTL: tokenTTL,
 		log:      log,
-	}, nil
+	}
 }
 
 func (a AAA) Login(name, password string) (string, error) {
-	return "", errors.New("implement me")
+	if p, ok := a.users[name]; !ok || p != password {
+		a.log.Warn("Login failed ", "user", name)
+		return "", core.ErrInvalidCredentials
+	}
+	claims := &jwt.RegisteredClaims{
+		Subject:   adminRole,
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(a.tokenTTL)),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secretKey))
+	if err != nil {
+		a.log.Error("Failed signing token", "error", err)
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func (a AAA) Verify(tokenString string) error {
-	return errors.New("implement me")
+	claims := &jwt.RegisteredClaims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+	if err != nil || !token.Valid {
+		a.log.Error("invalid token", "error", err)
+		return core.ErrInvalidToken
+	}
+	if claims.Subject != adminRole {
+		a.log.Warn("Token subject check failed", "expected", adminRole, "got", claims.Subject)
+		return core.ErrUnauthorised
+	}
+	return nil
 }

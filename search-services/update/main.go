@@ -14,6 +14,7 @@ import (
 	updatepb "yadro.com/course/proto/update"
 	"yadro.com/course/update/adapters/db"
 	updategrpc "yadro.com/course/update/adapters/grpc"
+	natsadapter "yadro.com/course/update/adapters/nats"
 	"yadro.com/course/update/adapters/words"
 	"yadro.com/course/update/adapters/xkcd"
 	"yadro.com/course/update/config"
@@ -62,8 +63,14 @@ func run(cfg config.Config, log *slog.Logger) error {
 		return fmt.Errorf("failed create Words client: %v", err)
 	}
 
+	// nats adapter
+	publisher, err := natsadapter.NewNatsPublisher(log, cfg.BrokerAddress)
+	if err != nil {
+		return fmt.Errorf("failed create Nats adapter")
+	}
+
 	// service
-	updater, err := core.NewService(log, storage, xkcd, words, cfg.XKCD.Concurrency)
+	updater, err := core.NewService(log, storage, xkcd, words, publisher, cfg.XKCD.Concurrency)
 	if err != nil {
 		return fmt.Errorf("failed create Update service: %v", err)
 	}
