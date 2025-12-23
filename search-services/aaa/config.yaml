@@ -1,0 +1,6 @@
+log_level: DEBUG
+aaa_address: localhost:85
+db_address: localhost:82
+access_secret: odnawofnqf
+refresh_secret: kajnofqngq
+access_ttl: 10m

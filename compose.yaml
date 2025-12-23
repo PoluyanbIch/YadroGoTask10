@@ -26,6 +26,27 @@ services:
       - update
       - search
 
+  aaa:
+    image: aaa:latest
+    build:
+      context: search-services
+      dockerfile: Dockerfile.aaa
+    container_name: aaa
+    restart: unless-stopped
+    ports:
+      - 28084:8080
+    volumes:
+      - ./search-services/aaa/config.yaml:/config.yaml
+    environment:
+      - AAA_ADDRESS=:8080
+      - DB_ADDRESS=postgres://postgres:password@postgres:5432/postgres
+      - ACCESS_SECRET=klqmpqegqg
+      - REFRESH_SECRET=pqjgepqgepqng
+      - ACCESS_TTL=10m
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   words:
     image: words:latest
     build:
