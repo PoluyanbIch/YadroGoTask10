@@ -54,53 +54,54 @@ message User {
 }
 
 message TrackSearchRequest {
-    int64 user_id = 1;
-    string query = 2;
+  int64 user_id = 1;
+  string query = 2;
 }
 
 message GetRecentSearchesRequest {
-    int64 user_id = 1;
-    int64 limit = 2;
+  int64 user_id = 1;
+  int64 limit = 2;
 }
 
 message GetRecentSearchesResponse {
-    repeated string queries = 1;
+  repeated string queries = 1;
 }
 
 // История просмотров
 message TrackComicViewRequest {
-    int64 user_id = 1;
-    int64 comic_id = 2;
+  int64 user_id = 1;
+  int64 comic_id = 2;
 }
 
 message GetRecentViewsRequest {
-    int64 user_id = 1;
-    int64 limit = 2;
+  int64 user_id = 1;
+  int64 limit = 2;
 }
 
 message GetRecentViewsResponse {
-    repeated int64 comic_ids = 1;
+  repeated int64 comic_ids = 1;
 }
 
 // Auth service provides authentication and token management operations
 service AAA {
-    // Ping checks if the service is available
-    rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  // Ping checks if the service is available
+  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 
-    // Login authenticates a user and returns access and refresh tokens
-    rpc Login(LoginRequest) returns (LoginResponse) {}
+  // Login authenticates a user and returns access and refresh tokens
+  rpc Login(LoginRequest) returns (LoginResponse) {}
 
-    // Register creates a new user account
-    rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  // Register creates a new user account
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
     
-    // ValidateToken verifies if a token is valid and returns user information
-    rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
-    
-    // RefreshToken refreshes an expired access token using a refresh token
-    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
+  // ValidateToken verifies if a token is valid and returns user information
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
+  
+  // RefreshToken refreshes an expired access token using a refresh token
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
 
-    rpc TrackSearch(TrackSearchRequest) returns (google.protobuf.Empty) {}
-    rpc TrackComicView(TrackComicViewRequest) returns (google.protobuf.Empty) {}
-    rpc GetRecentSearches(GetRecentSearchesRequest) returns (GetRecentSearchesResponse) {}
-    rpc GetRecentViews(GetRecentViewsRequest) returns (GetRecentViewsResponse) {}
+  rpc TrackSearch(TrackSearchRequest) returns (google.protobuf.Empty) {}
+  rpc TrackComicView(TrackComicViewRequest) returns (google.protobuf.Empty) {}
+  rpc GetRecentSearches(GetRecentSearchesRequest) 
+    returns (GetRecentSearchesResponse) {}
+  rpc GetRecentViews(GetRecentViewsRequest) returns (GetRecentViewsResponse) {}
 }

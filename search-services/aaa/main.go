@@ -50,7 +50,7 @@ func run(cfg config.Config, log *slog.Logger) error {
 		return fmt.Errorf("failed to migrate db: %v", err)
 	}
 
-	//token manager adapter
+	// token manager adapter
 	tokenManager := jwt.NewManager(log, cfg.AccessSecret, cfg.RefreshSecret, cfg.AccessTokenTTL)
 
 	// service

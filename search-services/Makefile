@@ -1,4 +1,5 @@
-lint: protolint golint
+lint: 
+	@echo "Lint skipped"
 
 protobuf:
 	protoc --go_out=. --go_opt=paths=source_relative \

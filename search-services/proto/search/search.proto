@@ -58,7 +58,8 @@ service Search {
   // GetComic returns detailed information about a comic by its ID
   rpc GetComic(GetComicRequest) returns (GetComicReply) {}
   // GetRecomendations provides comic recommendations based on user history
-  rpc GetRecommendations(RecommendationsRequest) returns (RecommendationsReply) {}
+  rpc GetRecommendations(RecommendationsRequest) 
+  returns (RecommendationsReply) {}
   // GetLatestComics returns the latest added comics
   rpc GetLatestComics(LatestComicsRequest) returns (LatestComicsReply) {}
 }
