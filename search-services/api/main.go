@@ -49,28 +49,68 @@ func main() {
 		os.Exit(1)
 	}
 
-	aaaService := aaa.New(cfg.TokenTTL, log, cfg.AdminUser, cfg.AdminPass)
+	aaaClient, err := aaa.NewClient(cfg.AAAAddress, log)
+	if err != nil {
+		log.Error("cannot init aaa adapter", "error", err)
+		os.Exit(1)
+	}
 
 	mux := http.NewServeMux()
 
-	mux.Handle("POST /api/login", rest.NewLoginHandler(log, &aaaService))
+	mux.Handle("POST /auth/login", rest.NewLoginHandler(log, aaaClient, cfg))
+	mux.Handle("POST /auth/register", rest.NewRegisterHandler(log, aaaClient, cfg))
+	mux.Handle("POST /auth/refresh", rest.NewRefreshHandler(log, aaaClient, cfg))
+	mux.Handle("POST /auth/logout", rest.NewLogoutHandler(log))
 
-	mux.Handle("GET /api/ping", rest.NewPingHandler(log, map[string]core.Pinger{"words": wordsClient, "update": updateClient, "search": searchClient}, cfg))
+	mux.Handle("GET /api/recent_views", middleware.RequiredAuthMiddleware(rest.NewGetRecentViewsHandler(log, aaaClient, cfg), aaaClient))
+	mux.Handle("GET /api/recent_searches", middleware.RequiredAuthMiddleware(rest.NewGetRecentSearchesHandler(log, aaaClient, cfg), aaaClient))
+
+	mux.Handle("GET /api/ping", rest.NewPingHandler(log, map[string]core.Pinger{"words": wordsClient, "update": updateClient, "search": searchClient, "aaa": aaaClient}, cfg))
 
 	mux.Handle("GET /api/words", rest.NewWordsHandler(log, wordsClient, cfg))
 
-	mux.Handle("GET /api/search", middleware.Concurrency(rest.NewSearchHandler(log, searchClient, cfg), cfg.SearchConcurrency))
-	mux.Handle("GET /api/isearch", middleware.Rate(rest.NewISearchHandler(log, searchClient, cfg), cfg.SearchRate))
+	mux.Handle("GET /api/search",
+		middleware.Concurrency(
+			middleware.OptionalAuthMiddleware( // 👈 Проверяет токен если есть
+				middleware.WithSearchTracking( // 👈 Трекает только если userID в контексте
+					rest.NewSearchHandler(log, searchClient, cfg),
+					aaaClient,
+					log,
+				),
+				aaaClient,
+			),
+			cfg.SearchConcurrency,
+		),
+	)
+	mux.Handle("GET /api/isearch",
+		middleware.Rate(
+			middleware.OptionalAuthMiddleware( // 👈 Проверяет токен если есть
+				middleware.WithSearchTracking( // 👈 Трекает только если userID в контексте
+					rest.NewSearchHandler(log, searchClient, cfg),
+					aaaClient,
+					log,
+				),
+				aaaClient,
+			),
+			cfg.SearchRate,
+		),
+	)
 
-	mux.Handle("POST /api/db/update", middleware.Auth(rest.NewUpdateHandler(log, updateClient, cfg), &aaaService))
+	mux.Handle("GET /api/comic", middleware.OptionalAuthMiddleware(middleware.WithComicViewTracking(rest.NewGetComicHandler(log, searchClient, cfg), aaaClient, log), aaaClient))
+	mux.Handle("GET /api/recommendations", middleware.RequiredAuthMiddleware(rest.NewGetRecommendationsHandler(log, searchClient, aaaClient, cfg), aaaClient))
+	mux.Handle("GET /api/latest_comics", rest.NewGetLatestComicsHandler(log, searchClient, cfg))
+
+	mux.Handle("POST /api/db/update", middleware.AdminMiddleware(rest.NewUpdateHandler(log, updateClient, cfg), aaaClient))
 	mux.Handle("GET /api/db/stats", rest.NewUpdateStatsHandler(log, updateClient, cfg))
 	mux.Handle("GET /api/db/status", rest.NewUpdateStatusHandler(log, updateClient, cfg))
-	mux.Handle("DELETE /api/db", middleware.Auth(rest.NewDropHandler(log, updateClient, cfg), &aaaService))
+	mux.Handle("DELETE /api/db", middleware.AdminMiddleware(rest.NewDropHandler(log, updateClient, cfg), aaaClient))
+
+	h := middleware.CorsMiddleware(mux, "http://localhost:3000,http://frontend:80")
 
 	server := http.Server{
 		Addr:        cfg.HTTPConfig.Address,
 		ReadTimeout: cfg.HTTPConfig.Timeout,
-		Handler:     mux,
+		Handler:     h,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)

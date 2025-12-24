@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+    <div class="container">
+        <div class="form-box">
+            <h2 style="text-align: center;">Login</h2>
+            <p id="errorMsg" class="error"></p>
+            <form id="loginForm">
+                <input type="text" id="login" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+            </form>
+            <p style="text-align: center; margin-top: 15px;">
+                No account? <a href="register.html">Register</a>
+            </p>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const loginVal = document.getElementById('login').value;
+            const passVal = document.getElementById('password').value;
+            
+            // Формируем x-www-form-urlencoded
+            const formData = new URLSearchParams();
+            formData.append('login', loginVal);
+            formData.append('password', passVal);
+
+            try {
+                const res = await apiRequest(`${AUTH_BASE}/login`, 'POST', formData, false);
+                // Сохраняем инфо о юзере, чтобы отрисовать UI (токен в httpOnly cookie)
+                localStorage.setItem('user', JSON.stringify(res.user));
+                window.location.href = 'index.html';
+            } catch (err) {
+                document.getElementById('errorMsg').innerText = "Login failed. Check credentials.";
+            }
+        };
+    </script>
+</body>
+</html>

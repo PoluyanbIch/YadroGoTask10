@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>Database Controls</h3>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="runUpdate()">Update Database</button>
+                <button onclick="deleteDb()" class="danger">Delete Database</button>
+            </div>
+            <p id="actionStatus" style="margin-top: 10px; font-style: italic;"></p>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <h3>Statistics</h3>
+            <div id="stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const user = getUser();
+        if (!user || !user.is_admin) {
+            alert("Access Denied");
+            window.location.href = 'index.html';
+        }
+
+        async function loadStats() {
+            try {
+                const s = await apiRequest(`${API_BASE}/db/stats`);
+                document.getElementById('stats').innerHTML = `
+                    <div><strong>Total Comics:</strong> ${s.comics_total}</div>
+                    <div><strong>Fetched Comics:</strong> ${s.comics_fetched}</div>
+                    <div><strong>Total Words:</strong> ${s.words_total}</div>
+                    <div><strong>Unique Words:</strong> ${s.words_unique}</div>
+                `;
+            } catch(e) { console.error(e); }
+        }
+
+        async function runUpdate() {
+            document.getElementById('actionStatus').innerText = "Updating...";
+            try {
+                await apiRequest(`${API_BASE}/db/update`, 'POST');
+                document.getElementById('actionStatus').innerText = "Update started.";
+                setTimeout(loadStats, 2000);
+            } catch(e) { document.getElementById('actionStatus').innerText = "Error updating."; }
+        }
+
+        async function deleteDb() {
+            if(!confirm("Are you sure?")) return;
+            try {
+                await apiRequest(`${API_BASE}/db`, 'DELETE');
+                alert("Database deleted");
+                loadStats();
+            } catch(e) { alert("Error deleting"); }
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comic Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1>Find XKCD Comics</h1>
+            <form id="searchForm" style="display: flex; gap: 10px; justify-content: center;">
+                <input type="text" id="searchInput" placeholder="Enter keywords..." style="max-width: 400px; margin: 0;">
+                <button type="submit" style="width: auto;">Search</button>
+            </form>
+        </div>
+
+        <h2 id="listTitle">Latest Comics</h2>
+        <div id="comicsGrid" class="grid"></div>
+    </div>
+
+    <script src="app.js" defer></script>
+
+    <script>
+        // 2. Оборачиваем все в слушатель события загрузки контента
+        window.addEventListener('DOMContentLoaded', () => {
+            const grid = 'comicsGrid';
+            
+            // Проверяем, загрузился ли наш API_BASE из app.js
+            if (typeof apiRequest === 'undefined') {
+                console.error("app.js не загружен! Проверьте путь к файлу в Docker.");
+                return;
+            }
+
+            // 1. Загрузка последних комиксов
+            apiRequest(`${API_BASE}/latest_comics`).then(res => {
+                renderComics(res.comics, grid);
+            }).catch(err => console.error("Initial load failed:", err));
+
+            // 2. Обработка поиска
+            document.getElementById('searchForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const query = document.getElementById('searchInput').value;
+                if(!query) return;
+
+                document.getElementById('listTitle').innerText = `Results for "${query}"`;
+                try {
+                    // Используем /isearch (Rate limited) или /search в зависимости от логики бэкенда
+                    const res = await apiRequest(`${API_BASE}/search?phrase=${encodeURIComponent(query)}`);
+                    renderComics(res.comics, grid);
+                } catch(e) {
+                    alert("Search failed or restricted. Try logging in.");
+                }
+            }
+        });
+    </script>
+</body>
+</html>

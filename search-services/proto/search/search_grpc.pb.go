@@ -20,18 +20,32 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Search_Ping_FullMethodName    = "/search.Search/Ping"
-	Search_Search_FullMethodName  = "/search.Search/Search"
-	Search_ISearch_FullMethodName = "/search.Search/ISearch"
+	Search_Ping_FullMethodName               = "/search.Search/Ping"
+	Search_Search_FullMethodName             = "/search.Search/Search"
+	Search_ISearch_FullMethodName            = "/search.Search/ISearch"
+	Search_GetComic_FullMethodName           = "/search.Search/GetComic"
+	Search_GetRecommendations_FullMethodName = "/search.Search/GetRecommendations"
+	Search_GetLatestComics_FullMethodName    = "/search.Search/GetLatestComics"
 )
 
 // SearchClient is the client API for Search service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// Search service provides methods for searching comics
 type SearchClient interface {
+	// Ping checks if the service is available
 	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Search returns comics matching the search phrase
 	Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchReply, error)
+	// ISearch returns comics matching the search phrase with index
 	ISearch(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchReply, error)
+	// GetComic returns detailed information about a comic by its ID
+	GetComic(ctx context.Context, in *GetComicRequest, opts ...grpc.CallOption) (*GetComicReply, error)
+	// GetRecomendations provides comic recommendations based on user history
+	GetRecommendations(ctx context.Context, in *RecommendationsRequest, opts ...grpc.CallOption) (*RecommendationsReply, error)
+	// GetLatestComics returns the latest added comics
+	GetLatestComics(ctx context.Context, in *LatestComicsRequest, opts ...grpc.CallOption) (*LatestComicsReply, error)
 }
 
 type searchClient struct {
@@ -72,13 +86,54 @@ func (c *searchClient) ISearch(ctx context.Context, in *SearchRequest, opts ...g
 	return out, nil
 }
 
+func (c *searchClient) GetComic(ctx context.Context, in *GetComicRequest, opts ...grpc.CallOption) (*GetComicReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetComicReply)
+	err := c.cc.Invoke(ctx, Search_GetComic_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *searchClient) GetRecommendations(ctx context.Context, in *RecommendationsRequest, opts ...grpc.CallOption) (*RecommendationsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RecommendationsReply)
+	err := c.cc.Invoke(ctx, Search_GetRecommendations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *searchClient) GetLatestComics(ctx context.Context, in *LatestComicsRequest, opts ...grpc.CallOption) (*LatestComicsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LatestComicsReply)
+	err := c.cc.Invoke(ctx, Search_GetLatestComics_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SearchServer is the server API for Search service.
 // All implementations must embed UnimplementedSearchServer
 // for forward compatibility.
+//
+// Search service provides methods for searching comics
 type SearchServer interface {
+	// Ping checks if the service is available
 	Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	// Search returns comics matching the search phrase
 	Search(context.Context, *SearchRequest) (*SearchReply, error)
+	// ISearch returns comics matching the search phrase with index
 	ISearch(context.Context, *SearchRequest) (*SearchReply, error)
+	// GetComic returns detailed information about a comic by its ID
+	GetComic(context.Context, *GetComicRequest) (*GetComicReply, error)
+	// GetRecomendations provides comic recommendations based on user history
+	GetRecommendations(context.Context, *RecommendationsRequest) (*RecommendationsReply, error)
+	// GetLatestComics returns the latest added comics
+	GetLatestComics(context.Context, *LatestComicsRequest) (*LatestComicsReply, error)
 	mustEmbedUnimplementedSearchServer()
 }
 
@@ -97,6 +152,15 @@ func (UnimplementedSearchServer) Search(context.Context, *SearchRequest) (*Searc
 }
 func (UnimplementedSearchServer) ISearch(context.Context, *SearchRequest) (*SearchReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ISearch not implemented")
+}
+func (UnimplementedSearchServer) GetComic(context.Context, *GetComicRequest) (*GetComicReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetComic not implemented")
+}
+func (UnimplementedSearchServer) GetRecommendations(context.Context, *RecommendationsRequest) (*RecommendationsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecommendations not implemented")
+}
+func (UnimplementedSearchServer) GetLatestComics(context.Context, *LatestComicsRequest) (*LatestComicsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLatestComics not implemented")
 }
 func (UnimplementedSearchServer) mustEmbedUnimplementedSearchServer() {}
 func (UnimplementedSearchServer) testEmbeddedByValue()                {}
@@ -173,6 +237,60 @@ func _Search_ISearch_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Search_GetComic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetComicRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SearchServer).GetComic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Search_GetComic_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SearchServer).GetComic(ctx, req.(*GetComicRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Search_GetRecommendations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecommendationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SearchServer).GetRecommendations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Search_GetRecommendations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SearchServer).GetRecommendations(ctx, req.(*RecommendationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Search_GetLatestComics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LatestComicsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SearchServer).GetLatestComics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Search_GetLatestComics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SearchServer).GetLatestComics(ctx, req.(*LatestComicsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Search_ServiceDesc is the grpc.ServiceDesc for Search service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +309,18 @@ var Search_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ISearch",
 			Handler:    _Search_ISearch_Handler,
+		},
+		{
+			MethodName: "GetComic",
+			Handler:    _Search_GetComic_Handler,
+		},
+		{
+			MethodName: "GetRecommendations",
+			Handler:    _Search_GetRecommendations_Handler,
+		},
+		{
+			MethodName: "GetLatestComics",
+			Handler:    _Search_GetLatestComics_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

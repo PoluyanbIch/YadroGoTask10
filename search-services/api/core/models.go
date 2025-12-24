@@ -24,3 +24,10 @@ type SearchReply struct {
 	Comics []SearchResult
 	Total  int
 }
+
+type User struct {
+	ID       int64
+	Login    string
+	PassHash string
+	IsAdmin  bool
+}

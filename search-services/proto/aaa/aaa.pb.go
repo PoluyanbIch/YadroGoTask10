@@ -561,7 +561,7 @@ func (x *TrackSearchRequest) GetQuery() string {
 type GetRecentSearchesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Limit         int64                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -603,7 +603,7 @@ func (x *GetRecentSearchesRequest) GetUserId() int64 {
 	return 0
 }
 
-func (x *GetRecentSearchesRequest) GetLimit() int32 {
+func (x *GetRecentSearchesRequest) GetLimit() int64 {
 	if x != nil {
 		return x.Limit
 	}
@@ -710,7 +710,7 @@ func (x *TrackComicViewRequest) GetComicId() int64 {
 type GetRecentViewsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Limit         int64                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -752,7 +752,7 @@ func (x *GetRecentViewsRequest) GetUserId() int64 {
 	return 0
 }
 
-func (x *GetRecentViewsRequest) GetLimit() int32 {
+func (x *GetRecentViewsRequest) GetLimit() int64 {
 	if x != nil {
 		return x.Limit
 	}
@@ -844,7 +844,7 @@ const file_proto_aaa_aaa_proto_rawDesc = "" +
 	"\x05query\x18\x02 \x01(\tR\x05query\"I\n" +
 	"\x18GetRecentSearchesRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x05R\x05limit\"5\n" +
+	"\x05limit\x18\x02 \x01(\x03R\x05limit\"5\n" +
 	"\x19GetRecentSearchesResponse\x12\x18\n" +
 	"\aqueries\x18\x01 \x03(\tR\aqueries\"K\n" +
 	"\x15TrackComicViewRequest\x12\x17\n" +
@@ -852,7 +852,7 @@ const file_proto_aaa_aaa_proto_rawDesc = "" +
 	"\bcomic_id\x18\x02 \x01(\x03R\acomicId\"F\n" +
 	"\x15GetRecentViewsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x05R\x05limit\"5\n" +
+	"\x05limit\x18\x02 \x01(\x03R\x05limit\"5\n" +
 	"\x16GetRecentViewsResponse\x12\x1b\n" +
 	"\tcomic_ids\x18\x01 \x03(\x03R\bcomicIds2\xea\x04\n" +
 	"\x03AAA\x128\n" +

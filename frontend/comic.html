@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comic View</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+    <div class="container" style="text-align: center;">
+        <div id="comicContainer">Loading comic...</div>
+    </div>
+    
+    <script src="app.js"></script>
+    <script>
+        // Ждем полной загрузки страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            // Инициализируем навигацию
+            if (typeof updateNav === 'function') {
+                updateNav();
+            }
+            
+            // Получаем ID из URL
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            // Проверяем доступность API функций
+            if (typeof apiRequest === 'undefined' || typeof API_BASE === 'undefined') {
+                document.getElementById('comicContainer').innerHTML = 
+                    '<p class="error">App not loaded. Check console for errors.</p>';
+                console.error('app.js not loaded!');
+                return;
+            }
+
+            async function loadComic() {
+                if(!id) {
+                    document.getElementById('comicContainer').innerText = "No comic ID provided";
+                    return;
+                }
+                
+                try {
+                    document.getElementById('comicContainer').innerText = "Loading...";
+                    
+                    // Делаем запрос к API
+                    const res = await apiRequest(`${API_BASE}/comic?id=${id}`);
+                    
+                    // Обрабатываем разные форматы ответа
+                    let comic;
+                    if (Array.isArray(res)) {
+                        comic = res[0];
+                    } else if (res.comic) {
+                        comic = res.comic;
+                    } else {
+                        comic = res;
+                    }
+                    
+                    if (!comic || !comic.id) {
+                        throw new Error('Invalid comic data');
+                    }
+                    
+                    // Отображаем комикс
+                    document.getElementById('comicContainer').innerHTML = `
+                        <h1>${comic.title || 'Comic'} #${comic.id}</h1>
+                        <div style="margin: 20px 0;">
+                            <img src="${comic.url || comic.img}" 
+                                 alt="${comic.alt_text || comic.title || 'Comic'}" 
+                                 style="max-width: 100%; max-height: 80vh; 
+                                        box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+                                        border-radius: 8px;">
+                        </div>
+                        ${comic.alt_text ? `<p style="font-style: italic; margin: 15px 0;">${comic.alt_text}</p>` : ''}
+                        ${comic.keywords ? `<p style="margin-top: 20px; color: #666;">Keywords: ${comic.keywords.join(', ')}</p>` : ''}
+                        <p style="margin-top: 20px;">
+                            <a href="index.html" style="color: #007bff;">← Back to all comics</a>
+                        </p>
+                    `;
+                    
+                } catch(e) {
+                    console.error("Failed to load comic:", e);
+                    document.getElementById('comicContainer').innerHTML = 
+                        `<p class="error">Failed to load comic #${id}. ${e.message}</p>
+                         <p style="margin-top: 20px;">
+                            <a href="index.html" style="color: #007bff;">← Back to all comics</a>
+                         </p>`;
+                }
+            }
+            
+            // Загружаем комикс
+            loadComic();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+body { font-family: sans-serif; margin: 0; background: #f4f4f9; color: #333; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+/* Навигация */
+nav { background: #333; padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; }
+nav a { color: white; text-decoration: none; margin-left: 15px; }
+nav a:hover { text-decoration: underline; }
+nav .brand { font-weight: bold; font-size: 1.2em; }
+
+/* Карточки */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+.card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
+.card:hover { transform: translateY(-5px); }
+.card img { max-width: 100%; height: auto; border-radius: 4px; }
+.card h3 { font-size: 1em; margin: 10px 0 5px; }
+
+/* Формы */
+.form-box { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;}
+button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+button:hover { background: #0056b3; }
+button.secondary { background: #6c757d; margin-top: 10px; }
+button.danger { background: #dc3545; }
+
+/* Табы профиля */
+.tabs { margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+.tab-btn { background: none; color: #555; width: auto; padding: 10px 20px; border-bottom: 3px solid transparent; border-radius: 0; }
+.tab-btn.active { border-color: #007bff; color: #007bff; font-weight: bold; }
+
+.error { color: red; margin-bottom: 10px; text-align: center; }

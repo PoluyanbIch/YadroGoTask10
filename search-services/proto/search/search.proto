@@ -21,8 +21,44 @@ message SearchReply {
   int64 total = 2;
 }
 
+message GetComicRequest {
+  int64 id = 1;
+}
+
+message GetComicReply {
+  Comics comic = 1;
+}
+
+message RecommendationsRequest {
+  repeated string search_history = 1;
+  repeated int64 view_history = 2;
+  int64 limit = 3;
+}
+
+message RecommendationsReply {
+  repeated Comics comics = 1;
+}
+
+message LatestComicsRequest {
+  int64 limit = 1;
+}
+
+message LatestComicsReply {
+  repeated Comics comics = 1;
+}
+
+// Search service provides methods for searching comics
 service Search {
+  // Ping checks if the service is available
   rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  // Search returns comics matching the search phrase
   rpc Search(SearchRequest) returns (SearchReply) {}
+  // ISearch returns comics matching the search phrase with index
   rpc ISearch(SearchRequest) returns (SearchReply) {}
+  // GetComic returns detailed information about a comic by its ID
+  rpc GetComic(GetComicRequest) returns (GetComicReply) {}
+  // GetRecomendations provides comic recommendations based on user history
+  rpc GetRecommendations(RecommendationsRequest) returns (RecommendationsReply) {}
+  // GetLatestComics returns the latest added comics
+  rpc GetLatestComics(LatestComicsRequest) returns (LatestComicsReply) {}
 }

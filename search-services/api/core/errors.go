@@ -8,7 +8,9 @@ var (
 	ErrInternal           = errors.New("internal error")
 	ErrUpdateInProgress   = errors.New("update in progress")
 
+	ErrUserNotFound       = errors.New("User not found")
+	ErrUserExists         = errors.New("user already exists")
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrInvalidToken       = errors.New("invalid token")
-	ErrUnauthorised       = errors.New("unauthorise")
+	ErrInvalidUserID      = errors.New("invalid user id")
 )

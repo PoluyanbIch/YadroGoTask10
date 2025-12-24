@@ -8,6 +8,9 @@ import (
 type Searcher interface {
 	Search(context.Context, string, int) ([]Comic, error)
 	ISearch(context.Context, string, int) ([]Comic, error)
+	GetComic(context.Context, int) (Comic, error)
+	GetRecommendations(context.Context, []string, []int, int) ([]Comic, error)
+	GetLatestComics(context.Context, int) ([]Comic, error)
 }
 
 //go:generate mockgen -destination=mock_db_test.go -package=core . DB

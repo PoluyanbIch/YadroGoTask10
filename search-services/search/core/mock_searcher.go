@@ -40,6 +40,51 @@ func (m *MockSearcher) EXPECT() *MockSearcherMockRecorder {
 	return m.recorder
 }
 
+// GetComic mocks base method.
+func (m *MockSearcher) GetComic(arg0 context.Context, arg1 int) (Comic, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetComic", arg0, arg1)
+	ret0, _ := ret[0].(Comic)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetComic indicates an expected call of GetComic.
+func (mr *MockSearcherMockRecorder) GetComic(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComic", reflect.TypeOf((*MockSearcher)(nil).GetComic), arg0, arg1)
+}
+
+// GetLatestComics mocks base method.
+func (m *MockSearcher) GetLatestComics(arg0 context.Context, arg1 int) ([]Comic, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLatestComics", arg0, arg1)
+	ret0, _ := ret[0].([]Comic)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLatestComics indicates an expected call of GetLatestComics.
+func (mr *MockSearcherMockRecorder) GetLatestComics(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestComics", reflect.TypeOf((*MockSearcher)(nil).GetLatestComics), arg0, arg1)
+}
+
+// GetRecommendations mocks base method.
+func (m *MockSearcher) GetRecommendations(arg0 context.Context, arg1 []string, arg2 []int, arg3 int) ([]Comic, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRecommendations", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].([]Comic)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRecommendations indicates an expected call of GetRecommendations.
+func (mr *MockSearcherMockRecorder) GetRecommendations(arg0, arg1, arg2, arg3 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecommendations", reflect.TypeOf((*MockSearcher)(nil).GetRecommendations), arg0, arg1, arg2, arg3)
+}
+
 // ISearch mocks base method.
 func (m *MockSearcher) ISearch(arg0 context.Context, arg1 string, arg2 int) ([]Comic, error) {
 	m.ctrl.T.Helper()

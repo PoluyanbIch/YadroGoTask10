@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+    <div class="container">
+        <h1>My Profile</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('recs')">Recommendations</button>
+            <button class="tab-btn" onclick="switchTab('history')">Search History</button>
+            <button class="tab-btn" onclick="switchTab('views')">Viewed Comics</button>
+        </div>
+
+        <div id="contentArea"></div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Проверка авторизации
+        if (!getUser()) window.location.href = 'login.html';
+
+        async function switchTab(tab) {
+            // UI переключение
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const content = document.getElementById('contentArea');
+            content.innerHTML = '<p>Loading...</p>';
+
+            try {
+                if (tab === 'recs') {
+                    const res = await apiRequest(`${API_BASE}/recommendations`, 'GET');
+                    content.innerHTML = `<div id="recGrid" class="grid"></div>`;
+                    renderComics(res.comics, 'recGrid');
+                } 
+                else if (tab === 'history') {
+                const res = await apiRequest(`${API_BASE}/recent_searches`);
+                if(res.queries && res.queries.length) {
+                    content.innerHTML = `
+                        <div class="history-list">
+                            <h3>Recent Searches</h3>
+                            ${res.queries.map(q => `
+                                <div class="history-item">
+                                    <a href="index.html?search=${encodeURIComponent(q)}" 
+                                    class="history-link">
+                                        <span class="search-query">${q}</span>
+                                    </a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                        content.innerHTML = '<p>No search history.</p>';
+                    }
+                }
+                else if (tab === 'views') {
+                    const res = await apiRequest(`${API_BASE}/recent_views`);
+                    // res.comic_ids - массив ID. В идеале нужно делать fetch для каждого, 
+                    // но здесь просто выведем список ссылок для простоты
+                    if(res.comic_ids && res.comic_ids.length) {
+                         const html = res.comic_ids.map(id => 
+                            `<div class="card" onclick="location.href='comic.html?id=${id}'"><h3>Comic #${id}</h3><p>Click to view</p></div>`
+                         ).join('');
+                         content.innerHTML = `<div class="grid">${html}</div>`;
+                    } else {
+                        content.innerHTML = '<p>No viewed comics.</p>';
+                    }
+                }
+            } catch (e) {
+                content.innerHTML = `<p class="error">Error loading data. ${e.message}</p>`;
+            }
+        }
+
+        // Загрузка по умолчанию
+        switchTab('recs');
+    </script>
+</body>
+</html>
